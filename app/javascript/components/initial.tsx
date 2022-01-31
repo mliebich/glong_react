@@ -4,13 +4,7 @@ export default [
   {
     id: '1',
     type: 'input',
-    data: {
-      label: (
-        <>
-          Welcome to <strong>React Flow!</strong>
-        </>
-      ),
-    },
+    data: { label: 'Another output node' },
     position: { x: 250, y: 0 },
   },
   {
@@ -58,13 +52,7 @@ export default [
   {
     id: '6',
     type: 'output',
-    data: {
-      label: (
-        <>
-          An <strong>output node</strong>
-        </>
-      ),
-    },
+    data: { label: 'Another output node' },
     position: { x: 100, y: 480 },
   },
   {
@@ -87,7 +75,7 @@ export default [
     source: '4',
     target: '5',
     arrowHeadType: 'arrowclosed',
-    label: 'edge with arrow head',
+    label: 'organische Chemie',
   },
   {
     id: 'e5-6',

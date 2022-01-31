@@ -1,87 +1,64 @@
-import React, { useState } from "react";
+
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import ReactFlow, {
-  applyNodeChanges,
-  applyEdgeChanges
-} from 'react-flow-renderer';
 
 import ReactFlow, {
-  useReactFlow,
+  removeElements,
+  addEdge,
+  MiniMap,
+  Controls,
   Background,
-  BackgroundVariant,
-  Node,
-  Edge,
-  ReactFlowProvider,
 } from 'react-flow-renderer';
 
-const defaultNodes: Node[] = [
-  { id: '1', type: 'input', data: { label: 'Node 1' }, position: { x: 250, y: 5 }, className: 'light' },
-  { id: '2', data: { label: 'Node 2' }, position: { x: 100, y: 100 }, className: 'light' },
-  { id: '3', data: { label: 'Node 3' }, position: { x: 400, y: 100 }, className: 'light' },
-  { id: '4', data: { label: 'Node 4' }, position: { x: 400, y: 200 }, className: 'light' },
-];
+import initialElements from './initial';
 
-const defaultEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2' },
-  { id: 'e1-3', source: '1', target: '3' },
-];
-
-const defaultEdgeOptions = {
-  animated: true,
+const onLoad = (reactFlowInstance) => {
+  console.log('flow loaded:', reactFlowInstance);
+  reactFlowInstance.fitView();
 };
 
-const DefaultNodes = () => {
-  const instance = useReactFlow();
-
-  const logToObject = () => console.log(instance.toObject());
-  const resetTransform = () => instance.setViewport({ x: 0, y: 0, zoom: 1 });
-
-  const updateNodePositions = () => {
-    instance.setNodes((nodes) =>
-      nodes.map((node) => {
-        node.position = {
-          x: Math.random() * 400,
-          y: Math.random() * 400,
-        };
-
-        return node;
-      })
-    );
-  };
-
-  const updateEdgeColors = () => {
-    instance.setEdges((edges) =>
-      edges.map((edge) => {
-        edge.style = {
-          stroke: '#ff5050',
-        };
-
-        return edge;
-      })
-    );
-  };
+const OverviewFlow = () => {
+  const [elements, setElements] = useState(initialElements);
+  const onElementsRemove = (elementsToRemove) =>
+    setElements((els) => removeElements(elementsToRemove, els));
+  const onConnect = (params) => setElements((els) => addEdge(params, els));
 
   return (
-    <ReactFlow defaultNodes={defaultNodes} defaultEdges={defaultEdges} defaultEdgeOptions={defaultEdgeOptions} fitView>
-      <Background variant={BackgroundVariant.Lines} />
+    <ReactFlow
+      style={{ height: 800 }}
+      elements={elements}
+      onElementsRemove={onElementsRemove}
+      onConnect={onConnect}
+      onLoad={onLoad}
+      snapToGrid={true}
+      snapGrid={[15, 15]}
+    >
+      <MiniMap
+        nodeStrokeColor={(n) => {
+          if (n.style?.background) return n.style.background;
+          if (n.type === 'input') return '#0041d0';
+          if (n.type === 'output') return '#ff0072';
+          if (n.type === 'default') return '#1a192b';
 
-      <div style={{ position: 'absolute', right: 10, top: 10, zIndex: 4 }}>
-        <button onClick={resetTransform} style={{ marginRight: 5 }}>
-          reset transform
-        </button>
-        <button onClick={updateNodePositions} style={{ marginRight: 5 }}>
-          change pos
-        </button>
-        <button onClick={updateEdgeColors} style={{ marginRight: 5 }}>
-          red edges
-        </button>
-        <button onClick={logToObject}>toObject</button>
-      </div>
+          return '#eee';
+        }}
+        nodeColor={(n) => {
+          if (n.style?.background) return n.style.background;
+
+          return '#fff';
+        }}
+        nodeBorderRadius={2}
+      />
+      <Controls />
+      <Background color="#aaa" gap={16} />
     </ReactFlow>
   );
 };
 
+
 document.addEventListener('DOMContentLoaded', () => {
-  const rootEl = document.getElementById('show')
-  ReactDOM.render(<DefaultNodes />, rootEl)
+  const container = document.getElementById('map')
+  const data = JSON.parse(container.getAttribute('data'))
+  console.log(data)
+  ReactDOM.render(<OverviewFlow />, container)
 })

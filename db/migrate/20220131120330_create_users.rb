@@ -4,7 +4,7 @@ class CreateUsers < ActiveRecord::Migration[7.0]
       t.string :name
       t.string :firstname
       t.string :image
-      t.string :class
+      t.string :classname
       t.string :maturayear
       t.string :usernodes, array: true
       t.boolean :active
