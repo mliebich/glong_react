@@ -2,3 +2,4 @@
 import "@hotwired/turbo-rails"
 import "./controllers"
 import "./components/map.tsx"
+//import "./components/modal.tsx"

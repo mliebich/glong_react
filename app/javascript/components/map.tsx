@@ -1,41 +1,87 @@
 import React, { useState } from "react";
 import ReactDOM from 'react-dom';
-import ReactFlow, { removeElements } from 'react-flow-renderer';
+import ReactFlow, {
+  applyNodeChanges,
+  applyEdgeChanges
+} from 'react-flow-renderer';
 
-const initialElements = [
-  {
-     id: '1',
-     type: 'input',
-     data: { label: 'Node 1' },
-     position: { x: 5, y: 5 },
-   },
-   { id: '2', data: { label: 'straight' }, position: { x: 100, y: 100 } },
-   { id: '3', data: { label: 'default' }, position: { x: 250, y: 150 } },
-   { id: '4', data: { label: 'step' }, position: { x: 500, y: 200 } },
-   { id: '5', data: { label: 'smoothstep' }, position: { x: 500, y: 200 } },
-   { id: 'e1-2', source: '1', target: '2', type: 'straight' },
-   { id: 'e1-3', source: '1', target: '3', type: 'default' },
-   { id: 'e1-4', source: '1', target: '4', type: 'step' },
-   { id: 'e1-5', source: '1', target: '5', type: 'smoothstep' },
+import ReactFlow, {
+  useReactFlow,
+  Background,
+  BackgroundVariant,
+  Node,
+  Edge,
+  ReactFlowProvider,
+} from 'react-flow-renderer';
+
+const defaultNodes: Node[] = [
+  { id: '1', type: 'input', data: { label: 'Node 1' }, position: { x: 250, y: 5 }, className: 'light' },
+  { id: '2', data: { label: 'Node 2' }, position: { x: 100, y: 100 }, className: 'light' },
+  { id: '3', data: { label: 'Node 3' }, position: { x: 400, y: 100 }, className: 'light' },
+  { id: '4', data: { label: 'Node 4' }, position: { x: 400, y: 200 }, className: 'light' },
 ];
 
-const flowStyles = { height: 500 };
+const defaultEdges: Edge[] = [
+  { id: 'e1-2', source: '1', target: '2' },
+  { id: 'e1-3', source: '1', target: '3' },
+];
 
-const Flow = () => {
-  const [elements, setElements] = useState(initialElements);
-  const onElementsRemove = (elementsToRemove) =>
-    setElements((els) => removeElements(elementsToRemove, els));
+const defaultEdgeOptions = {
+  animated: true,
+};
+
+const DefaultNodes = () => {
+  const instance = useReactFlow();
+
+  const logToObject = () => console.log(instance.toObject());
+  const resetTransform = () => instance.setViewport({ x: 0, y: 0, zoom: 1 });
+
+  const updateNodePositions = () => {
+    instance.setNodes((nodes) =>
+      nodes.map((node) => {
+        node.position = {
+          x: Math.random() * 400,
+          y: Math.random() * 400,
+        };
+
+        return node;
+      })
+    );
+  };
+
+  const updateEdgeColors = () => {
+    instance.setEdges((edges) =>
+      edges.map((edge) => {
+        edge.style = {
+          stroke: '#ff5050',
+        };
+
+        return edge;
+      })
+    );
+  };
 
   return (
-    <ReactFlow
-      elements={elements}
-      style={flowStyles}
-      onElementsRemove={onElementsRemove}
-    />
+    <ReactFlow defaultNodes={defaultNodes} defaultEdges={defaultEdges} defaultEdgeOptions={defaultEdgeOptions} fitView>
+      <Background variant={BackgroundVariant.Lines} />
+
+      <div style={{ position: 'absolute', right: 10, top: 10, zIndex: 4 }}>
+        <button onClick={resetTransform} style={{ marginRight: 5 }}>
+          reset transform
+        </button>
+        <button onClick={updateNodePositions} style={{ marginRight: 5 }}>
+          change pos
+        </button>
+        <button onClick={updateEdgeColors} style={{ marginRight: 5 }}>
+          red edges
+        </button>
+        <button onClick={logToObject}>toObject</button>
+      </div>
+    </ReactFlow>
   );
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   const rootEl = document.getElementById('show')
-  ReactDOM.render(<Flow />, rootEl)
+  ReactDOM.render(<DefaultNodes />, rootEl)
 })
